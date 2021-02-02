@@ -57,8 +57,12 @@ void loop() {
     else if (button == TRIANGLE) {
       pOpen(25, 29);
       Serial.println("P2Open");
-
-    } else {
+    } 
+    else if (button == START) {
+      relaysOff();
+      Serial.println("Relays Off");
+    }
+    else {
       ThrowMotor.brakeHercules();
       Serial.println("Brake motor");
     }
