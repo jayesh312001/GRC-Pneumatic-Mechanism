@@ -1,2 +1,9 @@
 # GRC-Pneumatic-Mechanism
-Manual and Auto code for Operating this bot
+Manual controls:
+1. SQUARE = P1OPEN
+2. CIRCLE = P1CLOSE
+3. CROSS = P2CLOSE
+4. TRIANGLE = P2OPEN
+5. LEFT = MOTOR CLOCK
+6. RIGHT = MOTOR ANTICLOCK
+
