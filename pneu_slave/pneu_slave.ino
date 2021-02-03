@@ -9,7 +9,6 @@ Encoder ThrowEnc(3, 2);
 bool initialPosition = false;
 int reedCount = 0;
 byte button = 0;
-int flag = 0;
 void setup() {
   Serial.begin(115200);
   pinMode(MISO, OUTPUT); // have to send on master in so it set as output
@@ -28,7 +27,7 @@ void loop() {
 
   if (limitClk == LOW || limitAclk == LOW) {
     ThrowMotor.brakeHercules();
-      Serial.println("Brake motor");
+    Serial.println("Brake motor");
   }
   else {
     if (button == RIGHT) {
@@ -41,23 +40,37 @@ void loop() {
     }
     // Grabbing Pneumatic
     else if (button == SQUARE) {
-      pClose(23, 27);
+      pClose(25, 29);
       Serial.println("P1CLOSE");
     }
     else if (button == CIRCLE) {
-      pOpen(23, 27);
+      pOpen(25, 29);
       Serial.println("P1Open");
     }
 
     // Throwing Pneumatic
     else if (button == CROSS) {
-      pClose(25, 29);
+      pClose(23, 27);
       Serial.println("P2clOSE");
     }
+    else if (button == DOWN) {
+      pHold(23, 27);
+      Serial.println("Motor anticlock");
+    }
     else if (button == TRIANGLE) {
-      pOpen(25, 29);
+      //      pOpen(23, 27);
       Serial.println("P2Open");
-    } 
+      while (reedCount < 2) {
+        if (reedSwitch == 0) {
+          reedCount++;
+        } else {
+          pHold(23, 27);
+        }
+      }
+      pOpen(23, 27);
+      delay(1000);
+      reedCount = 0 ;
+    }
     else if (button == START) {
       relaysOff();
       Serial.println("Relays Off");
@@ -67,7 +80,6 @@ void loop() {
       Serial.println("Brake motor");
     }
   }
-
 }
 
 void grabberAclk(int pulses) {
