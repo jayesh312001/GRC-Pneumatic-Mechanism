@@ -1,17 +1,4 @@
-#include "Motor.h"
-#include "Func.h"
-#include "Pneumatic.h"
-#include <Encoder.h>
-#include<SPI.h>
-
-Motor ThrowMotor(Throw_pwm, Throw_in1, Throw_in2);
-Encoder ThrowEnc(3, 2);
-
-Pneumatic Thrower(ThrowP1, ThrowP2);
-Pneumatic Grabber(GrabP1, GrabP2);
-
-int reedCount = 0;
-byte button = 0;
+#include "Config.h"
 
 void setup() {
   Serial.begin(115200);
