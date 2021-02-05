@@ -27,6 +27,15 @@ void loop() {
 
   if (limitClk == LOW || limitAclk == LOW) {
     ThrowMotor.brakeHercules();
+    if(limitClk == LOW) {
+      ThrowMotor.aclk(60);
+      delay(50);
+      ThrowMotor.brakeHercules();
+    } else if(limitAclk == LOW) {
+      ThrowMotor.clk(60);
+      delay(50);
+      ThrowMotor.brakeHercules();
+    }
     Serial.println("Brake motor");
   }
   else {
@@ -50,7 +59,9 @@ void loop() {
 
     // Throwing Pneumatic
     else if (button == CROSS) {
+
       pClose(23, 27);
+
       Serial.println("P2clOSE");
     }
     else if (button == DOWN) {
@@ -58,7 +69,6 @@ void loop() {
       Serial.println("Motor anticlock");
     }
     else if (button == TRIANGLE) {
-      //      pOpen(23, 27);
       Serial.println("P2Open");
       while (reedCount < 2) {
         if (reedSwitch == 0) {
@@ -72,6 +82,17 @@ void loop() {
       reedCount = 0 ;
     }
     else if (button == START) {
+      while (limitClk == HIGH) {
+        ThrowMotor.clk(60);
+      }
+      ThrowMotor.brakeHercules();
+      delay(10);
+      ThrowMotor.aclk(60);
+      delay(50);
+      ThrowMotor.brakeHercules();
+      ThrowEnc.write(0);
+    }
+    else if (button == SELECT) {
       relaysOff();
       Serial.println("Relays Off");
     }
