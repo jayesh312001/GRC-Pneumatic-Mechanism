@@ -1,14 +1,18 @@
 #include "Motor.h"
 #include "Func.h"
+#include "Pneumatic.h"
 #include <Encoder.h>
 #include<SPI.h>
 
 Motor ThrowMotor(Throw_pwm, Throw_in1, Throw_in2);
 Encoder ThrowEnc(3, 2);
 
-bool initialPosition = false;
+Pneumatic Thrower(ThrowP1, ThrowP2);
+Pneumatic Grabber(GrabP1, GrabP2);
+
 int reedCount = 0;
 byte button = 0;
+
 void setup() {
   Serial.begin(115200);
   pinMode(MISO, OUTPUT); // have to send on master in so it set as output
@@ -16,91 +20,115 @@ void setup() {
   SPI.attachInterrupt();// enable spi module'
   pinModes();
   relaysOff();
-
 }
 
 ISR(SPI_STC_vect) {
-  button = SPDR;
+  switch (button) {
+    case DISC:
+      button = 0;
+      SPDR = 0;
+    default:
+      button = SPDR;
+  }
 }
 
 void loop() {
 
   if (limitClk == LOW || limitAclk == LOW) {
     ThrowMotor.brakeHercules();
-    if(limitClk == LOW) {
-      ThrowMotor.aclk(60);
-      delay(50);
-      ThrowMotor.brakeHercules();
-    } else if(limitAclk == LOW) {
-      ThrowMotor.clk(60);
-      delay(50);
-      ThrowMotor.brakeHercules();
+    ThrowEnc.write(0);
+    if (limitClk == LOW && limitAclk == HIGH) {
+      grabberAclk(30);
+    } else if (limitAclk == LOW && limitClk == HIGH) {
+      grabberClk(30);
     }
     Serial.println("Brake motor");
   }
   else {
-    if (button == RIGHT) {
-      ThrowMotor.clk(100);
-      Serial.println("Motor clock");
-    }
-    else if (button == LEFT) {
-      ThrowMotor.aclk(100);
-      Serial.println("Motor anticlock");
-    }
-    // Grabbing Pneumatic
-    else if (button == SQUARE) {
-      pClose(25, 29);
-      Serial.println("P1CLOSE");
-    }
-    else if (button == CIRCLE) {
-      pOpen(25, 29);
-      Serial.println("P1Open");
-    }
 
-    // Throwing Pneumatic
-    else if (button == CROSS) {
+    switch (button) {
+      case RIGHT:
+        ThrowMotor.clk(100);
+        Serial.println(ThrowEnc.read());
+        break;
 
-      pClose(23, 27);
+      case LEFT:
+        ThrowMotor.aclk(100);
+        Serial.println(ThrowEnc.read());
+        break;
 
-      Serial.println("P2clOSE");
-    }
-    else if (button == DOWN) {
-      pHold(23, 27);
-      Serial.println("Motor anticlock");
-    }
-    else if (button == TRIANGLE) {
-      Serial.println("P2Open");
-      while (reedCount < 2) {
-        if (reedSwitch == 0) {
-          reedCount++;
-        } else {
-          pHold(23, 27);
+      case SQUARE:
+        Grabber.Open();
+        delay(50);
+        Grabber.Free();
+        Serial.println("Open the grabber");
+        break;
+
+      case CIRCLE:
+        Grabber.Close();
+        delay(50);
+        Grabber.Free();
+        Serial.println("Grab the arrow");
+        break;
+
+      case CROSS:
+        Thrower.Close();
+        delay(50);
+        Thrower.Free();
+        Serial.println("Thrower Down");
+        break;
+
+      case TRIANGLE:
+        if (readEncoder < 2000) {
+          Serial.println("Thrower Up");
+          while (reedCount < 2) {
+            if (reedSwitch == 0) {
+              reedCount++;
+            } else {
+              Thrower.Free();
+            }
+          }
+          Thrower.Open();
+          delay(1000);
+          reedCount = 0 ;
         }
-      }
-      pOpen(23, 27);
-      delay(1000);
-      reedCount = 0 ;
-    }
-    else if (button == START) {
-      while (limitClk == HIGH) {
-        ThrowMotor.clk(60);
-      }
-      ThrowMotor.brakeHercules();
-      delay(10);
-      ThrowMotor.aclk(60);
-      delay(50);
-      ThrowMotor.brakeHercules();
-      ThrowEnc.write(0);
-    }
-    else if (button == SELECT) {
-      relaysOff();
-      Serial.println("Relays Off");
-    }
-    else {
-      ThrowMotor.brakeHercules();
-      Serial.println("Brake motor");
+
+        break;
+
+      case START:
+        iniPos();
+        break;
+
+      case DOWN:
+        Grabber.Open();
+        delay(100);
+        Grabber.Close();
+        break;
+
+      case SELECT:
+        Grabber.Close();
+        grabberAclk(20);
+        ThrowMotor.brakeHercules();
+        delay(1000);
+        grabberAclk(2500);
+        break;
+
+      default:
+        ThrowMotor.brakeHercules();
+        break;
+
     }
   }
+}
+
+
+void iniPos() {
+  while (limitClk == HIGH) {
+    ThrowMotor.clk(60);
+  }
+  ThrowEnc.write(0);
+  grabberAclk(50);
+  ThrowEnc.write(0);
 }
 
 void grabberAclk(int pulses) {
