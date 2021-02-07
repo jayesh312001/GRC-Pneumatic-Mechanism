@@ -2,14 +2,14 @@
 #include "Motor.h"
 #include "Pneumatic.h"
 #include <Encoder.h>
-#include<SPI.h>
+
 
 // Definition of pins ---------------------------------
 #define Throw_pwm 4
 #define Throw_in1 5
 #define Throw_in2 28
-#define GrabP1 27
-#define GrabP2 23
+#define GrabP1 23
+#define GrabP2 27
 #define ThrowP1 25
 #define ThrowP2 29
 

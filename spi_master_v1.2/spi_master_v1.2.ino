@@ -6,7 +6,7 @@ void setup()
   Serial.begin(115200);
   Ps3.attach(vspiCommand);
   Ps3.attachOnConnect(onConnect);
-  Ps3.begin("66:55:44:33:22:11");
+  Ps3.begin("33:33:33:33:33:33");
   Serial.println("Ready.");
   pinMode(5, OUTPUT); //VSPI SS
   pinMode(2, OUTPUT);
