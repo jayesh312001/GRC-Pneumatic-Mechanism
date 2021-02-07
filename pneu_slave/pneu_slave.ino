@@ -1,14 +1,7 @@
-#include "Motor.h"
-#include "Func.h"
-#include <Encoder.h>
+#include "Config.h"
 #include<SPI.h>
 
-Motor ThrowMotor(Throw_pwm, Throw_in1, Throw_in2);
-Encoder ThrowEnc(3, 2);
 
-bool initialPosition = false;
-int reedCount = 0;
-byte button = 0;
 void setup() {
   Serial.begin(115200);
   pinMode(MISO, OUTPUT); // have to send on master in so it set as output
@@ -16,84 +9,163 @@ void setup() {
   SPI.attachInterrupt();// enable spi module'
   pinModes();
   relaysOff();
-
+  Thrower.Open()
+  Grabber.Open();
 }
 
 ISR(SPI_STC_vect) {
-  button = SPDR;
+  switch (button) {
+    case DISC:
+      button = 0;
+      SPDR = 0;
+    default:
+      button = SPDR;
+  }
 }
 
 void loop() {
-
   if (limitClk == LOW || limitAclk == LOW) {
-    ThrowMotor.brakeHercules();
-    Serial.println("Brake motor");
+    GrabMotor.brakeHercules();
+    GrabEnc.write(0);
+    if (limitClk == LOW && limitAclk == HIGH) {
+      grabberAclk(30);
+      GrabEnc.write(0);
+    } else if (limitAclk == LOW && limitClk == HIGH) {
+      grabberClk(30);
+      GrabEnc.write(0);
+    }
+    Serial.println("Limit Switch Brake");
   }
   else {
-    if (button == RIGHT) {
-      ThrowMotor.clk(100);
-      Serial.println("Motor clock");
-    }
-    else if (button == LEFT) {
-      ThrowMotor.aclk(100);
-      Serial.println("Motor anticlock");
-    }
-    // Grabbing Pneumatic
-    else if (button == SQUARE) {
-      pClose(25, 29);
-      Serial.println("P1CLOSE");
-    }
-    else if (button == CIRCLE) {
-      pOpen(25, 29);
-      Serial.println("P1Open");
-    }
+    switch (button) {
+      case UP:
+        bot.forward(50, 50, 50, 50);
+        break;
 
-    // Throwing Pneumatic
-    else if (button == CROSS) {
-      pClose(23, 27);
-      Serial.println("P2clOSE");
-    }
-    else if (button == DOWN) {
-      pHold(23, 27);
-      Serial.println("Motor anticlock");
-    }
-    else if (button == TRIANGLE) {
-      //      pOpen(23, 27);
-      Serial.println("P2Open");
-      while (reedCount < 2) {
-        if (reedSwitch == 0) {
-          reedCount++;
-        } else {
-          pHold(23, 27);
+      case DOWN:
+        bot.backward(50, 50, 50, 50);
+        break;
+
+      case LEFT:
+        bot.left(50, 50, 50, 50);
+        break;
+
+      case RIGHT:
+        bot.right(50, 50, 50, 50);
+        break;
+
+       case UPRIGHT:
+        bot.upRight(50, 50, 50, 50);
+        break;
+
+      case UPLEFT:
+        bot.upLeft(50, 50, 50, 50);
+        break;
+
+      case DOWNRIGHT:
+        bot.downRight(50, 50, 50, 50);
+        break;
+
+      case DOWNLEFT:
+        bot.downLeft(50, 50, 50, 50);
+        break;
+
+      case L1:
+        GrabMotor.clk(100);
+        Serial.println(readEncoder);
+        break;
+
+      case R1:
+        GrabMotor.aclk(100);
+        Serial.println(readEncoder);
+        break;
+
+      case SQUARE:
+        Grabber.Close();
+        Serial.println("Open the grabber");
+        break;
+
+      case CIRCLE:
+        Grabber.Open();
+        Serial.println("Grab the arrow");
+        break;
+
+      case CROSS:
+        Thrower.Close();
+        delay(10);
+        Thrower.Free();
+        Serial.println("Thrower Down");
+        break;
+
+      case TRIANGLE:
+        Serial.print(reedCount);
+        Serial.println("Thrower Up");
+        while (reedCount < 2) {
+          Serial.print(reedCount); Serial.println(" count") ;
+          if (reedSwitch == 0) {
+            reedCount++;
+          } else {
+            Serial.print(reedCount); Serial.println(" count") ;
+            Thrower.Free();
+          }
         }
-      }
-      pOpen(23, 27);
-      delay(1000);
-      reedCount = 0 ;
-    }
-    else if (button == START) {
-      relaysOff();
-      Serial.println("Relays Off");
-    }
-    else {
-      ThrowMotor.brakeHercules();
-      Serial.println("Brake motor");
+        Serial.print(reedCount);
+        Thrower.Open();
+        delay(1000);
+        reedCount = 0 ;
+        break;
+
+      case START:
+        iniPos();
+        break;
+
+      case SELECT:
+        Grabber.Close();
+        grabberAclk(25);
+        GrabMotor.brakeHercules();
+        //move bot forward
+        delay(3000);
+        grabberAclk(2400);
+        delay(3000);
+        Thrower.Close();
+        delay(3000);
+        grabberAclk(2800);
+        Grabber.Open();
+        delay(1000);
+        grabberAclk(3500);
+        GrabMotor.brakeHercules();
+        break;
+
+      default:
+        GrabMotor.brakeHercules();
+        break;
     }
   }
+}
+
+
+void iniPos() {
+  while (limitClk == HIGH) {
+    GrabMotor.clk(60);
+  }
+  GrabEnc.write(0);
+  GrabMotor.brakeHercules();
+  grabberAclk(35);
+  GrabEnc.write(0);
 }
 
 void grabberAclk(int pulses) {
   while (readEncoder < pulses) {
-    ThrowMotor.aclk(50);
-    //    Serial.println(ThrowEnc.read());
+    GrabMotor.aclk(50);
+    //    Serial.println(GrabEnc.read());
   }
-  ThrowMotor.brakeHercules();
+  GrabMotor.brakeHercules();
 }
 
 void grabberClk(int pulses) {
   while (readEncoder > -pulses) {
-    ThrowMotor.clk(50);
-    //    Serial.println(ThrowEnc.read());
+    GrabMotor.clk(50);
+    //    Serial.println(GrabEnc.read());
   }
-  ThrowMotor.brakeHercules();
+  GrabMotor.brakeHercules();
 }

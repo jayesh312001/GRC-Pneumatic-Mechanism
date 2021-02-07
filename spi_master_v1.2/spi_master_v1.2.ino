@@ -10,10 +10,10 @@ void setup()
   Serial.println("Ready.");
   pinMode(5, OUTPUT); //VSPI SS
   pinMode(2, OUTPUT);
-  digitalWrite(2, 1); 
+  digitalWrite(2, 1);
 }
 void spi_send(int x)
-  {
+{
   SPI.beginTransaction(SPISettings(spiClk, MSBFIRST, SPI_MODE0));
   digitalWrite(5, LOW); //pull SS slow to prep other end for transfer
   SPI.transfer(x);
@@ -51,6 +51,22 @@ void vspiCommand()
     else if (Ps3.data.button.r1)
     {
       spi_send(R1);
+      Print("R1-2");
+    }
+    else if(Ps3.data.button.up && Ps3.data.button.right) {
+      spi_send(UPRIGHT);
+      Print("R1-2");
+    }
+    else if(Ps3.data.button.up && Ps3.data.button.left) {
+      spi_send(UPLEFT);
+      Print("R1-2");
+    }
+    else if(Ps3.data.button.down && Ps3.data.button.right) {
+      spi_send(DOWNRIGHT);
+      Print("R1-2");
+    }
+    else if(Ps3.data.button.down && Ps3.data.button.right) {
+      spi_send(DOWNLEFT);
       Print("R1-2");
     }
     /***********************************************************************/

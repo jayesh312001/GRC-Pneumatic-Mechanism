@@ -17,8 +17,10 @@
 #define PS 12
 #define START 13
 #define SELECT 14
-#define DISC 255
-#define serial_print 1
+#define UPRIGHT 15
+#define UPLEFT 16
+#define DOWNLEFT 17
+#define DOWNRIGHT 18
 /*#define L_UP 187
   //#define R_UP 19
   #define L_DOWN 188
@@ -37,7 +39,8 @@
   #define R_UP_LEFT 194
   #define AnalogLEFT 195
   #define AnalogRIGHT 196*/
-
+#define DISC 255
+#define serial_print 1
 static const int spiClk = 1000000; // 1 MHz
 volatile byte joy[5] = {0, 0, 0, 0, 0};
 void onConnect() {
