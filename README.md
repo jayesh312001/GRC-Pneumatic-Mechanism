@@ -1,9 +1,23 @@
 # GRC-Pneumatic-Mechanism
-Manual controls:
-1. SQUARE = P1OPEN
-2. CIRCLE = P1CLOSE
-3. CROSS = P2CLOSE
-4. TRIANGLE = P2OPEN
-5. LEFT = MOTOR CLOCK
-6. RIGHT = MOTOR ANTICLOCK
+## Manual controls:
+
+### Base motion 
+UP = Base up
+DOWN = Base Down
+LEFT = Base Left
+RIGHT = Base Right
+UP + RIGHT = Base upright
+UP + LEFT = Base upleft
+DOWN + RIGHT = Base downright
+DOWN + LEFT = Base downleft
+
+### Pneumatic and grabber controls
+SQUARE = Grabber Close
+CIRCLE = Grabber Open
+CROSS = Thrower Down
+TRIANGLE = Thrower Up
+L1 = MOTOR CLOCK
+R1 = MOTOR ANTICLOCK
+START = Go to initial position
+SELECT = Go to loading position //Incomplete function
 
