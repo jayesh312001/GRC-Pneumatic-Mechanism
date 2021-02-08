@@ -43,6 +43,8 @@ Encoder GrabEnc(3, 2);
 Pneumatic Thrower(ThrowP1, ThrowP2);
 Pneumatic Grabber(GrabP1, GrabP2);
 
+
+// Base motors and Bot object
 Motor motor1(FR1, FR2, FRP);
 Motor motor2(BR1, BR2, BRP);
 Motor motor3(BL1, BL2, BLP);
@@ -71,25 +73,6 @@ void relaysOff() {
   digitalWrite(GrabP2, HIGH);
   digitalWrite(ThrowP1, HIGH);
   digitalWrite(ThrowP2, HIGH);
-}
-
-void pClose(int pin1, int pin2) {
-  digitalWrite(pin1, LOW);
-  digitalWrite(pin2, HIGH);
-}
-void pFree(int pin1, int pin2) {
-  digitalWrite(pin1, LOW);
-  digitalWrite(pin2, LOW);
-}
-
-void pOpen(int pin1, int pin2) {
-  digitalWrite(pin1, HIGH);
-  digitalWrite(pin2, LOW);
-}
-
-void pHold(int pin1, int pin2) {
-  digitalWrite(pin1, HIGH);
-  digitalWrite(pin2, HIGH);
 }
 
 // Constants for PS ------------------------------
