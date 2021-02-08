@@ -2,6 +2,7 @@
 ## Manual controls:
 
 ### Base motion 
+
 UP = Base up
 DOWN = Base Down
 LEFT = Base Left
@@ -12,6 +13,7 @@ DOWN + RIGHT = Base downright
 DOWN + LEFT = Base downleft
 
 ### Pneumatic and grabber controls
+
 SQUARE = Grabber Close
 CIRCLE = Grabber Open
 CROSS = Thrower Down
